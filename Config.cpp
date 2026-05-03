@@ -20,9 +20,19 @@ std::vector<std::string> Config::ConfigFileAsVector() {
 }
 
 
-// Loads config data and returns dictionary containing data
-std::map<std::string, std::string> Config::LoadConfig() {
+// Loads config data and returns dictionary
+std::map<std::string, std::string> Config::LoadConfigLines() {
+
+
+	// Make sure config file exists
+	if (!std::filesystem::exists(relativeConfigFilePath)) {
+		std::ofstream outInAInBFileCreation(relativeConfigFilePath);
+		outInAInBFileCreation.close();
+	}
 	std::ifstream ConfigFile(relativeConfigFilePath);
+
+
+
 	std::map<std::string, std::string> resultDictionary;
 
 
@@ -89,8 +99,98 @@ std::map<std::string, std::string> Config::LoadConfig() {
 }
 
 
+Config::Config() {
+	LoadConfig();
+}
+
+
+void Config::LoadConfig() {
+	std::map<std::string, std::string> configData = LoadConfigLines();
+
+
+
+	// Translating parametres from string to their types
+	auto TVKeysPos = configData.find("TVKeys");
+	auto MenuKeysPos = configData.find("MenuKeys");
+	auto PanicKeysPos = configData.find("PanicKeys");
+	auto SpyCheckPos = configData.find("SpyCheck");
+	auto SpyPanicPos = configData.find("SpyPanic");
+
+	if (TVKeysPos != configData.end()) {
+		std::istringstream paramSS(configData["TVKeys"]);
+		int val;
+
+		TVKeys.clear();
+		while (paramSS >> val) {
+			TVKeys.push_back(val);
+		}
+	}
+
+	if (MenuKeysPos != configData.end()) {
+		std::istringstream paramSS(configData["MenuKeys"]);
+		int val;
+
+		MenuKeys.clear();
+		while (paramSS >> val) {
+			MenuKeys.push_back(val);
+		}
+	}
+
+	if (PanicKeysPos != configData.end()) {
+		std::istringstream paramSS(configData["PanicKeys"]);
+		int val;
+
+		PanicKeys.clear();
+		while (paramSS >> val) {
+			PanicKeys.push_back(val);
+		}
+	}
+
+	if (SpyCheckPos != configData.end()) {
+		if (configData["SpyCheck"] == "true") {
+			SpyCheck = true;
+		}
+		else {
+			SpyCheck = false;
+		}
+	}
+
+	if (SpyPanicPos != configData.end()) {
+		if (configData["SpyPanic"] == "true") {
+			SpyPanic = true;
+		}
+		else {
+			SpyPanic = false;
+		}
+	}
+}
+
+
+std::string joinKeysInString(std::vector<int> keys) {
+	std::ostringstream ss;
+	for (size_t i = 0; i < keys.size(); i++) {
+		ss << keys[i] << (i == keys.size() - 1 ? "" : " ");
+	}
+	return ss.str();
+}
+
 // Changes config parametres
-void Config::ChangeConfig(std::map<std::string, std::string> params) {
+void Config::SaveConfig() {
+	// Creating param strings
+	std::string tvKeysSaveString = joinKeysInString(TVKeys);
+	std::string MenuKeysSaveString = joinKeysInString(MenuKeys);
+	std::string PanicKeysSaveString = joinKeysInString(PanicKeys);
+	std::string SpyCheckSaveString = (SpyCheck ? "true" : "false");
+	std::string SpyPanicSaveString = (SpyPanic ? "true" : "false");
+	std::map<std::string, std::string> params = {
+		{ "TVKeys", tvKeysSaveString },
+		{ "MenuKeys", MenuKeysSaveString },
+		{ "PanicKeys", PanicKeysSaveString },
+		{ "SpyCheck", SpyCheckSaveString },
+		{ "SpyPanic", SpyPanicSaveString },
+	};
+
+
 	std::vector<std::string> oldConfigLines = Config::ConfigFileAsVector();
 
 
@@ -124,6 +224,11 @@ void Config::ChangeConfig(std::map<std::string, std::string> params) {
 		params.erase(paramKey);
 	}
 
+
+	const std::string vklink = "# virtual key codes - https://learn.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes";
+	if (oldConfigLines.size() != 0 && oldConfigLines[0] != vklink) {
+		ConfigFile << vklink << "\n" << std::endl;
+	}
 
 	for (const auto& i : oldConfigLines) {
 		ConfigFile << i << std::endl;

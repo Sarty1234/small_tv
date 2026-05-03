@@ -30,6 +30,16 @@ int WINAPI WinMain(
     _In_ int       nCmdShow
 )
 {
+    // Loading configs
+    Config appConfig;
+
+
+
+
+
+
+
+
     WNDCLASSEX wcex;
 
     wcex.cbSize = sizeof(WNDCLASSEX);
@@ -126,24 +136,17 @@ int WINAPI WinMain(
 //  WM_DESTROY  - post a quit message and return
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-    enum ProgramState
+    static enum ProgramState
     {
         TV,
         HIDDEN
     };
 
-    // *****************  PROGRAMM SETTINGS  *****************
-    // virtual key codes - https://learn.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes
-    std::vector<int> TVKeys = { 0x47, 0x11 }; // g+ctrl
-    std::vector<int> PanicKey = { 0x43, 0x11 };  // c+ctrl
-    bool SpyCheck = true;
-    bool PanicOnSpy = false;
 
 
 
 
-    //      Load parametres
-    std::ofstream configFile();
+
 
 
 
