@@ -166,6 +166,7 @@ void Config::LoadConfig() {
 }
 
 
+
 std::string joinKeysInString(std::vector<int> keys) {
 	std::ostringstream ss;
 	for (size_t i = 0; i < keys.size(); i++) {
@@ -174,7 +175,7 @@ std::string joinKeysInString(std::vector<int> keys) {
 	return ss.str();
 }
 
-// Changes config parametres
+// Saves config parametres
 void Config::SaveConfig() {
 	// Creating param strings
 	std::string tvKeysSaveString = joinKeysInString(TVKeys);

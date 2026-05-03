@@ -7,6 +7,7 @@
 #include <tchar.h>
 #include <vector>
 #include <string>
+#include <atlstr.h>
 #include "Config.h"
 
 // Global variables
@@ -23,6 +24,9 @@ HINSTANCE hInst;
 // Forward declarations of functions included in this code module:
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 
+
+// Loading configs
+static Config appConfig;
 int WINAPI WinMain(
     _In_ HINSTANCE hInstance,
     _In_opt_ HINSTANCE hPrevInstance,
@@ -30,16 +34,6 @@ int WINAPI WinMain(
     _In_ int       nCmdShow
 )
 {
-    // Loading configs
-    Config appConfig;
-
-
-
-
-
-
-
-
     WNDCLASSEX wcex;
 
     wcex.cbSize = sizeof(WNDCLASSEX);
@@ -128,6 +122,43 @@ int WINAPI WinMain(
 
 
 
+
+std::string GetVirtualKeyName(UINT vkCode) {
+    // 1. Map virtual key to scan code
+    UINT scanCode = MapVirtualKey(vkCode, MAPVK_VK_TO_VSC);
+
+    // 2. Prepare lParam for GetKeyNameText
+    // Bits 16-23 must contain the scan code.
+    LONG lParam = scanCode << 16;
+
+    // Handle extended keys (like arrow keys, right Alt, etc.)
+    // These often require the "extended" bit (bit 24) to be set.
+    switch (vkCode) {
+    case VK_INSERT: case VK_DELETE: case VK_HOME: case VK_END:
+    case VK_PRIOR:  case VK_NEXT:   case VK_LEFT: case VK_UP:
+    case VK_RIGHT:  case VK_DOWN:   case VK_DIVIDE: case VK_NUMLOCK:
+        lParam |= (1 << 24);
+        break;
+    }
+
+    char keyName[256];
+    if (GetKeyNameTextA(lParam, keyName, sizeof(keyName)) > 0) {
+        return std::string(keyName);
+    }
+    return "Unknown Key";
+}
+
+
+std::string KeyVectorToString(std::vector<int> keys) {
+    std::string keystring = "";
+    for (size_t i = 0; i < keys.size(); i++) {
+        keystring += GetVirtualKeyName(keys[i]) + (i == keys.size() - 1 ? "" : " + ");
+    }
+
+    return keystring;
+}
+
+
 //  FUNCTION: WndProc(HWND, UINT, WPARAM, LPARAM)
 //
 //  PURPOSE:  Processes messages for the main window.
@@ -147,23 +178,25 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 
 
-
-
-
     PAINTSTRUCT ps;
     HDC hdc;
-    TCHAR greeting[] = _T("Hello, Windows desktop!");
     TCHAR messageStringBuffer[256];
     POINT mouseposition;
 
 
     // ***************** UI elements data
-    // Draw new field button
+    
+    std::string TVKeysString = KeyVectorToString(appConfig.TVKeys);
+    std::string MenuKeysString = KeyVectorToString(appConfig.MenuKeys);
+    std::string PanicKeysString = KeyVectorToString(appConfig.PanicKeys);
+
+
     int UIELEMENT_DrawNewFieldButton_X = 10;
     int UIELEMENT_DrawNewFieldButton_CX = 100;
     int UIELEMENT_DrawNewFieldButton_Y = 10;
     int UIELEMENT_DrawNewFieldButton_CY = 20;
     HBRUSH UIELEMENT_DrawNewFieldButton_Brush = CreateSolidBrush(RGB(0, 0, 0));
+    
 
 
 
@@ -180,7 +213,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         // in the top left corner.
         TextOut(hdc,
             50, 50,
-            greeting, _tcslen(greeting));
+            CA2T(TVKeysString.c_str()), _tcslen(CA2T(TVKeysString.c_str())));
         SetPixel(hdc, 5, 5, RGB(255, 0, 0));
         
 

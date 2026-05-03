@@ -30,7 +30,7 @@ public:
     // Loads config data in class
     void LoadConfig();
 
-    // Changes config parametres
+    // Saves config parametres
     void SaveConfig();
 };
 
