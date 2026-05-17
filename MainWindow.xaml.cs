@@ -27,15 +27,10 @@ namespace smallTV
 
 
         // Params
-        Key HotkeyResetFinishKey = Key.RightShift;
-
-
-
-
-
-        List<Key> MenuKeys = [Key.Enter, Key.C, Key.LeftShift];
-        List<Key> TVKeys = [Key.Enter, Key.V, Key.LeftShift];
-        List<Key> PanicKeys = [Key.Enter, Key.B, Key.LeftShift];
+        Key HotkeyResetFinishKey => Config.Instance.HotkeyResetFinishKey;
+        List<Key> MenuKeys = Config.Instance.MenuKeys;
+        List<Key> TVKeys = Config.Instance.TVKeys;
+        List<Key> PanicKeys = Config.Instance.PanicKeys;
 
 
         private void ResetMenuKeysButton_Click(object sender, RoutedEventArgs e)
@@ -68,6 +63,7 @@ namespace smallTV
                 )
             {
                 MenuKeys.Insert(0, e.Key);
+                Config.Instance.Save();
                 e.Handled = true;
                 UpdateKeyLabels();
             }
@@ -79,6 +75,7 @@ namespace smallTV
                 )
             {
                 TVKeys.Insert(0, e.Key);
+                Config.Instance.Save();
                 e.Handled = true;
                 UpdateKeyLabels();
             }
@@ -90,6 +87,7 @@ namespace smallTV
                 )
             {
                 PanicKeys.Insert(0, e.Key);
+                Config.Instance.Save();
                 e.Handled = true;
                 UpdateKeyLabels();
             }
