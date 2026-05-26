@@ -30,4 +30,8 @@
     </Content>
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="SharpHook" Version="7.1.2" />
+  </ItemGroup>
+
 </Project>

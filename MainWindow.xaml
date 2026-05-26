@@ -6,7 +6,8 @@
         xmlns:local="clr-namespace:smallTV"
         mc:Ignorable="d"
         Title="Small TV" Height="280" Width="250"
-        KeyDown="Window_KeyDown">
+        KeyDown="Window_KeyDown"
+        Loaded="Window_Loaded">
     <Grid>
         <Label Content="Open/Hide menu keys" FontFamily="HP Simplified" HorizontalAlignment="Left" Margin="20,20,0,0" Height="25" Width="120" VerticalAlignment="Top"/>
         <Button Name="ResetMenuKeysButton" Click="ResetMenuKeysButton_Click" HorizontalAlignment="Left" Margin="40,50,0,0" VerticalAlignment="Top" Height="20" Width="80" BorderThickness="0">
