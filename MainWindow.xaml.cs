@@ -46,7 +46,20 @@ namespace smallTV
         {
             lock (PressedKeys) {
                 Key pressedKey = KeyInterop.KeyFromVirtualKey((int)e.Data.KeyCode);
+                if ((int)e.Data.RawCode == 160)
+                {
+                    pressedKey = Key.LeftShift;
+                } 
+                else if ((int)e.Data.RawCode == 162)
+                {
+                    pressedKey = Key.LeftCtrl;
+                }
+                else if ((int)e.Data.RawCode == 164)
+                {
+                    pressedKey = Key.LeftAlt;
+                }
                 PressedKeys.Add(pressedKey);
+
 
 
 
@@ -174,7 +187,7 @@ namespace smallTV
 
         private void UpdateKeyLabels()
         {
-            string keySeparator = " + ";
+            string keySeparator = " -> ";
             int keySeparatorLength = keySeparator.Length;
             string awaitingNewKeyText = "Enter new hotkey";
             string howToStopText = $" (Press {HotkeyResetFinishKey.ToString()} to stop)";
@@ -189,7 +202,7 @@ namespace smallTV
             }
             else
             {
-                for (int i = MenuKeys.Count - 1; i >= 0; i--)
+                for (int i = 0; i < MenuKeys.Count; i++)
                 {
                     Key k = MenuKeys[i];
                     if (k == HotkeyResetFinishKey)
@@ -213,7 +226,7 @@ namespace smallTV
             }
             else
             {
-                for (int i = TVKeys.Count - 1; i >= 0; i--)
+                for (int i = 0; i < TVKeys.Count; i++)
                 {
                     Key k = TVKeys[i];
                     if (k == HotkeyResetFinishKey)
@@ -237,7 +250,7 @@ namespace smallTV
             }
             else
             {
-                for (int i = PanicKeys.Count - 1; i >= 0; i--)
+                for (int i = 0; i < PanicKeys.Count; i++)
                 {
                     Key k = PanicKeys[i];
                     if (k == HotkeyResetFinishKey)
@@ -268,13 +281,18 @@ namespace smallTV
 
 
 
-        int b = 0;
         public void MenuFunction()
         {
-            b += 1;
-            MenuKeysLabel.Content = b;
-
-            //MessageBox.Show("hi");
+            if (this.WindowState == WindowState.Minimized)
+            {
+                WindowState = WindowState.Normal;
+                this.Activate();
+                // this.Focus();
+            } 
+            else
+            {
+                WindowState = WindowState.Minimized;
+            }
         }
 
 
@@ -286,7 +304,7 @@ namespace smallTV
 
         public void PanicFunction()
         {
-
+            Application.Current.Shutdown();
         }
     }
 }
