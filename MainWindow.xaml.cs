@@ -1,14 +1,16 @@
-﻿using System;
+﻿using SharpHook;
+using SharpHook.Data;
+using System;
+using System.Diagnostics;
+using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
-using System.Threading;
-using SharpHook.Data;
-using SharpHook;
-using System.Threading.Tasks;
 using System.Windows.Threading;
 
 namespace smallTV
@@ -274,13 +276,68 @@ namespace smallTV
         }
 
 
+
+
+
+        // 1. Get the handle (HWND) of the currently focused window
+        [DllImport("user32.dll")]
+        private static extern IntPtr GetForegroundWindow();
+
+        // 2. Get the Process ID that created that window handle
+        [DllImport("user32.dll", SetLastError = true)]
+        private static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
+
+        /// <summary>
+        /// Gets the Process ID of the currently focused window.
+        /// </summary>
+        /// <returns>The Process ID, or null if it couldn't be retrieved.</returns>
+        public static int? GetFocusedProcessId()
+        {
+            IntPtr hwnd = GetForegroundWindow();
+            if (hwnd == IntPtr.Zero)
+            {
+                return null; // No window is currently focused (e.g., switching contexts)
+            }
+
+            GetWindowThreadProcessId(hwnd, out uint processId);
+            return (int)processId;
+        }
+
+        /// <summary>
+        /// Optional: Gets the full Process details of the focused window.
+        /// </summary>
+        public static Process GetFocusedProcess()
+        {
+            int? pid = GetFocusedProcessId();
+            if (pid.HasValue)
+            {
+                try
+                {
+                    return Process.GetProcessById(pid.Value);
+                }
+                catch (ArgumentException)
+                {
+                    // The process might have closed right after we got the PID
+                    return null;
+                }
+            }
+            return null;
+        }
         private void SelectWindowButton_Click(object sender, RoutedEventArgs e)
         {
+            Console.Beep(1000, 100);
+            Thread.Sleep(5000);
+            Console.Beep(1000, 100);
 
+            tvProcess = GetFocusedProcess();
+            SelectedWindowLabel.Content = tvProcess.ProcessName;
+            this.Activate();
+            this.Focus();
         }
 
 
 
+        
 
 
 
@@ -301,14 +358,59 @@ namespace smallTV
         }
 
 
+
+
+        // 1. Get the handle (HWND) of the currently focused window
+        [DllImport("user32.dll")]
+        private static extern bool ShowWindow(IntPtr hwnd, int nCmdShow);
+
+
+        // 2. Freeze process
+        [DllImport("ntdll.dll")]
+        private static extern uint NtSuspendProcess(IntPtr processHandle);
+
+
+        // 3. Resume process
+        [DllImport("ntdll.dll")]
+        private static extern uint NtResumeProcess(IntPtr processHandle);
+
+        // Standard Win32 ShowWindow constants
+        private const int SW_HIDE = 0;
+        private const int SW_SHOWNORMAL = 1;
+        private const int SW_SHOWMINIMIZED = 2;
+        private const int SW_SHOWMAXIMIZED = 3;
+        private const int SW_RESTORE = 9;
+
+
+        Process tvProcess = null;
+        private bool HideWindow = true;
         public void TVFunction()
         {
+            if (tvProcess == null) return;
+            if (HideWindow)
+            {
+                ShowWindow(tvProcess.MainWindowHandle, SW_HIDE);
+                WindowState = WindowState.Minimized;
+                NtSuspendProcess(tvProcess.Handle);
+            } else
+            {
+                NtResumeProcess(tvProcess.Handle);
+                ShowWindow(tvProcess.MainWindowHandle, SW_RESTORE);
+            }
 
+            HideWindow = !HideWindow;
         }
 
 
         public void PanicFunction()
         {
+            if (tvProcess != null)
+            {
+                ShowWindow(tvProcess.MainWindowHandle, SW_HIDE);
+                tvProcess.Kill();
+            }
+            
+            WindowState = WindowState.Minimized;
             Application.Current.Shutdown();
         }
     }
