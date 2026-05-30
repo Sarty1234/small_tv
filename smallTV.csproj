@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <None Remove="Images\false.png" />
+    <None Remove="Images\Reload.png" />
     <None Remove="Images\Reset.png" />
     <None Remove="Images\Select.png" />
     <None Remove="Images\true.png" />
@@ -17,6 +18,9 @@
 
   <ItemGroup>
     <Content Include="Images\false.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Reload.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Images\Reset.png">
