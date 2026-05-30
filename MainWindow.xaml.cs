@@ -146,6 +146,11 @@ namespace smallTV
             this.Focus();
         }
 
+        private void ReloadPressedKeysButton_Click(object sender, RoutedEventArgs e)
+        {
+            PressedKeys.Clear();
+        }
+
         private void Window_KeyDown(object sender, KeyEventArgs e)
         {
             if (
