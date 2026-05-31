@@ -44,9 +44,17 @@ namespace smallTV
 
 
 
+        private DateTime _lastKeyUpdate = DateTime.MinValue;
         private void OnKeyPressed(object sender, KeyboardHookEventArgs e)
         {
             lock (PressedKeys) {
+                if ((DateTime.Now - _lastKeyUpdate).TotalSeconds >= 1)
+                {
+                    PressedKeys.Clear();
+                }
+                _lastKeyUpdate = DateTime.Now;
+
+
                 Key pressedKey = KeyInterop.KeyFromVirtualKey((int)e.Data.KeyCode);
                 if ((int)e.Data.RawCode == 160)
                 {
@@ -337,24 +345,33 @@ namespace smallTV
 
 
 
-        
 
 
 
 
 
+
+        private bool ShowMenu = false;
         public void MenuFunction()
         {
-            if (this.WindowState == WindowState.Minimized)
+            var helper = new System.Windows.Interop.WindowInteropHelper(this);
+            IntPtr hwnd = helper.Handle;
+
+
+            if (ShowMenu)
             {
-                WindowState = WindowState.Normal;
+                ShowWindow(hwnd, SW_SHOWNORMAL);
                 this.Activate();
-                // this.Focus();
+                this.Focus();
+
             } 
             else
             {
                 WindowState = WindowState.Minimized;
+                ShowWindow(hwnd, SW_HIDE);
             }
+
+            ShowMenu = !ShowMenu;
         }
 
 
@@ -390,7 +407,6 @@ namespace smallTV
             if (HideWindow)
             {
                 ShowWindow(tvProcess.MainWindowHandle, SW_HIDE);
-                WindowState = WindowState.Minimized;
                 NtSuspendProcess(tvProcess.Handle);
             } else
             {
@@ -410,7 +426,7 @@ namespace smallTV
                 tvProcess.Kill();
             }
             
-            WindowState = WindowState.Minimized;
+
             Application.Current.Shutdown();
         }
     }

@@ -14,14 +14,14 @@
         </Button>
 
 
-        <Label Content="Open/Hide menu keys" FontFamily="HP Simplified" HorizontalAlignment="Left" Margin="20,20,0,0" Height="25" Width="120" VerticalAlignment="Top"/>
+        <Label Content="Menu keys" FontFamily="HP Simplified" HorizontalAlignment="Left" Margin="20,20,0,0" Height="25" Width="120" VerticalAlignment="Top"/>
         <Button Name="ResetMenuKeysButton" Click="ResetMenuKeysButton_Click" HorizontalAlignment="Left" Margin="40,50,0,0" VerticalAlignment="Top" Height="20" Width="80" BorderThickness="0">
             <Image Source="/Images/Reset.png" Stretch="Fill"/>
         </Button>
         <Label Name="MenuKeysLabel" Content="Key1+Key2+Key3" FontFamily="HP Simplified" HorizontalAlignment="Left" Margin="130,47,0,0" Height="25" VerticalAlignment="Top"/>
 
 
-        <Label Content="Open/Hide tv keys" FontFamily="HP Simplified" HorizontalAlignment="Left" Margin="20,80,0,0" Height="25" Width="120" VerticalAlignment="Top"/>
+        <Label Content="TV keys" FontFamily="HP Simplified" HorizontalAlignment="Left" Margin="20,80,0,0" Height="25" Width="120" VerticalAlignment="Top"/>
         <Button Name="ResetTVKeysButton" Click="ResetTVKeysButton_Click" HorizontalAlignment="Left" Margin="40,110,0,0" VerticalAlignment="Top" Height="20" Width="80" BorderThickness="0">
             <Image Source="/Images/Reset.png" Stretch="Fill"/>
         </Button>
